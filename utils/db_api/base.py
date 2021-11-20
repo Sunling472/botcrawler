@@ -15,7 +15,7 @@ class PostDb:
 
     def add_post(self, url: str, post_id: int):
         self.curs.execute(
-            'INSERT INTO posts (url, post_id)'
+            'INSERT INTO posts_url_id (url, post_id)'
             'VALUES (%s, %s)',
             (url, post_id)
         )
@@ -23,7 +23,7 @@ class PostDb:
 
     def last_key(self) -> int:
         self.curs.execute(
-            'SELECT post_id FROM posts'
+            'SELECT post_id FROM posts_url_id'
         )
         keys_tuples: list = self.curs.fetchall()
         if keys_tuples is not None:
