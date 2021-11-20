@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from utils.db_api.base import PostDb
+from utils.db_api.base import PostUrlId
 
 
 class SgCrawler:
@@ -43,7 +43,7 @@ class SgCrawler:
         print(url)
         return title, text_list, url
 
-db = PostDb()
+db = PostUrlId()
 
 sg = SgCrawler()
 url: str = sg.get_last_url()
