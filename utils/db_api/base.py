@@ -18,35 +18,35 @@ class PostUrlId(Db):
 
     def add_post(self, url: str, post_id: int):
         self.curs.execute(
-            'INSERT INTO posts_url_id (url, post_id)'
+            'INSERT INTO posts_urls_id (url, post_id)'
             'VALUES (%s, %s)',
             (url, post_id)
         )
         self.conn.commit()
 
-    def get_last_id(self) -> int:
+    def get_last_id(self) -> int | None:
         self.curs.execute(
-            'SELECT post_id FROM posts_url_id'
+            'SELECT post_id FROM posts_urls_id'
         )
         keys_tuples: list = self.curs.fetchall()
-        if keys_tuples is not None:
+        if len(keys_tuples) != 0:
             keys: tuple = keys_tuples[-1]
             for key in keys:
                 return key
         else:
-            print('В базе ещё нет записей')
+            return None
 
-    def get_last_url(self) -> str:
+    def get_last_url(self) -> str | None:
         self.curs.execute(
-            'SELECT url FROM posts_url_id'
+            'SELECT url FROM posts_urls_id'
         )
         urls_list: list = self.curs.fetchall()
-        if urls_list is not None:
+        if len(urls_list) != 0:
             url_t: tuple = urls_list[-1]
             for url in url_t:
                 return url
         else:
-            print('В базе ещё нет записей')
+            return None
 
 
 class FullPosts(Db):
@@ -57,17 +57,17 @@ class FullPosts(Db):
         )
         self.conn.commit()
 
-    def get_last_fpost_id(self) -> int:
+    def get_last_fpost_id(self) -> str | None:
         self.curs.execute(
             'SELECT post_id FROM full_posts'
         )
         last_fposts_id: list = self.curs.fetchall()
-        if last_fposts_id is not None:
+        if len(last_fposts_id) != 0:
             last_fposts_id_t: tuple = last_fposts_id[-1]
             for last_fpost_id in last_fposts_id_t:
                 return last_fpost_id
         else:
-            print('В базе ещё нет записей')
+            return None
 
 
 class UserDb(Db):
@@ -84,10 +84,15 @@ class UserDb(Db):
             'SELECT user_id FROM users '
             'WHERE user_id = %s', (user_id,)
         )
-        users: list = self.curs.fetchall()
-        if user_id in users:
-            return True
-        else:
+        users: list = self.curs.fetchone()
+        try:
+            for user in users:
+                if user_id == user:
+                    return True
+            else:
+                return False
+        except TypeError:
+            print('Ошибка. База пользователей пуста')
             return False
 
     def set_sub_status(self, status: bool, user_id: int):
@@ -97,7 +102,7 @@ class UserDb(Db):
         )
         self.conn.commit()
 
-    def is_sub(self, user_id: int) -> bool:
+    def is_sub(self, user_id: int) -> bool | None:
         self.curs.execute(
             'SELECT is_sub FROM users '
             'WHERE user_id=%s', (user_id,)
@@ -107,5 +112,18 @@ class UserDb(Db):
             for is_sub in sub_t:
                 return is_sub
         else:
-            print('Такого пользователя не существует.')
+            return None
 
+    def get_subs_id(self) -> list | None:
+        subs_id: list = []
+        self.curs.execute(
+            'SELECT user_id FROM users WHERE is_sub = True'
+        )
+        result: list = self.curs.fetchall()
+        if len(result) != 0:
+            for r in result:
+                for id in r:
+                    subs_id.append(id)
+            return subs_id
+        else:
+            return None
