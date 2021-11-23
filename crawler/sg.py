@@ -1,19 +1,19 @@
 import requests
 from bs4 import BeautifulSoup
-from utils.db_api.base import PostUrlId
 
 
 class SgCrawler:
     host: str = 'https://stopgame.ru'
     news_dir: str = '/news'
 
-
-    def __init__(self):
-        self.html: requests.Response = requests.get(self.host + self.news_dir)
-        self.bs: BeautifulSoup = BeautifulSoup(self.html.text, 'lxml')
+    def get_response(self) -> BeautifulSoup:
+        html: requests.Response = requests.get(self.host + self.news_dir)
+        bs: BeautifulSoup = BeautifulSoup(html.text, 'lxml')
+        return bs
 
     def get_last_key(self) -> str | None:
-        last_news: list = self.bs.select(
+        bs: BeautifulSoup = self.get_response()
+        last_news: list = bs.select(
             '.items > div.item.article-summary'
         )
         last: BeautifulSoup = last_news[0]
@@ -22,7 +22,8 @@ class SgCrawler:
         return last_key
 
     def get_last_url(self) -> str | None:
-        last_news: list = self.bs.select(
+        bs: BeautifulSoup = self.get_response()
+        last_news: list = bs.select(
             '.items > div.item.article-summary'
         )
         last: BeautifulSoup = last_news[0]

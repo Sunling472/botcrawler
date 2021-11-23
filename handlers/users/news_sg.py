@@ -1,13 +1,11 @@
 import asyncio
-from aiogram import types, Bot
 
-from loader import dp, bot
-from utils.db_api.base import PostUrlId, FullPosts, UserDb
+from loader import bot
+from utils.db_api.base import FullPosts, UserDb
 from crawler.sg import SgCrawler
 
 crawler_sg: SgCrawler = SgCrawler()
 
-posts_url_id_db: PostUrlId = PostUrlId()
 full_posts_db: FullPosts() = FullPosts()
 users_db: UserDb = UserDb()
 

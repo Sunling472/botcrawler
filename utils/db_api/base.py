@@ -14,41 +14,6 @@ class Db:
     curs: cursor = conn.cursor()
 
 
-class PostUrlId(Db):
-
-    def add_post(self, url: str, post_id: int):
-        self.curs.execute(
-            'INSERT INTO posts_urls_id (url, post_id)'
-            'VALUES (%s, %s)',
-            (url, post_id)
-        )
-        self.conn.commit()
-
-    def get_last_id(self) -> int | None:
-        self.curs.execute(
-            'SELECT post_id FROM posts_urls_id'
-        )
-        keys_tuples: list = self.curs.fetchall()
-        if len(keys_tuples) != 0:
-            keys: tuple = keys_tuples[-1]
-            for key in keys:
-                return key
-        else:
-            return None
-
-    def get_last_url(self) -> str | None:
-        self.curs.execute(
-            'SELECT url FROM posts_urls_id'
-        )
-        urls_list: list = self.curs.fetchall()
-        if len(urls_list) != 0:
-            url_t: tuple = urls_list[-1]
-            for url in url_t:
-                return url
-        else:
-            return None
-
-
 class FullPosts(Db):
     def add_full_post(self, title: str, body: str, url: str, post_id: int):
         self.curs.execute(
@@ -92,7 +57,7 @@ class UserDb(Db):
             else:
                 return False
         except TypeError:
-            print('Ошибка. База пользователей пуста')
+
             return False
 
     def set_sub_status(self, status: bool, user_id: int):

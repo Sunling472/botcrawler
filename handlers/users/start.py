@@ -1,24 +1,14 @@
 from contextlib import suppress
 
 from aiogram import types
-from aiogram.dispatcher.filters.builtin import CommandStart, Text
+from aiogram.dispatcher.filters.builtin import Text
 from aiogram.utils.exceptions import MessageNotModified
 
 from loader import dp
 from utils.db_api.base import UserDb
+from keyboards.inline.sub import get_keyboard
 
 db: UserDb = UserDb()
-
-
-def get_keyboard(user_id: int) -> types.InlineKeyboardMarkup:
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    buttons: list = [
-        types.InlineKeyboardButton(text='Активировать', callback_data=f'activate|{user_id}'),
-        types.InlineKeyboardButton(text='Отключить', callback_data=f'deactivate|{user_id}')
-    ]
-    keyboard.add(*buttons)
-
-    return keyboard
 
 
 def sub(user_id: int):
@@ -40,7 +30,7 @@ def get_hello_text(full_name: str, user_id: int) -> str:
 
 async def get_sub_status(message: types.Message, user_id: int):
         is_sub: str = sub(user_id)
-        sub_text: str = f'Статус вашей подписки: {is_sub}'
+        sub_text: str = f'Статус вашей подписки: <b>{is_sub}</b>'
         with suppress(MessageNotModified):
             await message.edit_text(sub_text, reply_markup=get_keyboard(user_id))
 
@@ -51,20 +41,22 @@ async def bot_start(message: types.Message):
     full_name: str = message.from_user.full_name
     hello_text: str = get_hello_text(full_name, user_id)
     is_sub: str = sub(user_id)
-    sub_text: str = f'Статус вашей подписки: {is_sub}'
+    sub_text: str = f'Статус вашей подписки: <b>{is_sub}</b>'
 
     if not db.is_reg(user_id):
         db.add_user(user_id)
         await message.answer(
             text=hello_text + sub_text,
-            reply_markup=get_keyboard(user_id)
+            reply_markup=get_keyboard(user_id),
+            parse_mode='HTML'
         )
 
     else:
 
         await message.answer(
             text=hello_text + sub_text,
-            reply_markup=get_keyboard(user_id)
+            reply_markup=get_keyboard(user_id),
+            parse_mode='HTML'
         )
 
 
